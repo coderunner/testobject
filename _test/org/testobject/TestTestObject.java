@@ -5,6 +5,12 @@ import static org.junit.Assert.* ;
 
 public class TestTestObject
 {
+	//TODO: should work on void method as well...need to define throwable
+	//TODO: parameters matching for return or throw
+	//TODO: param matching using a comparator
+	//TODO: need match any type of matching
+	//TODO: is more than one exact call that matched, then sequence?
+	
 	@Test
 	public void shouldReturnDefaultPrimitiveValueIfNoRecordingForInterface()
 	{
@@ -46,8 +52,6 @@ public class TestTestObject
 		TestInterface testObject = TestObject.createTestObject(TestClass.class);		
 		assertReturnRecordedValue(testObject);
 	}
-	
-	//TODO: should work on void method as well...need to define throwable
 	
 	@Test
 	public void recordThrowExceptionShouldThrowExceptionInterface()
