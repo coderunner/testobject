@@ -125,7 +125,8 @@ public class TestObject
 			{
 				throw new RuntimeException("No method call");
 			}
-			if(!lastMethodCalled.getReturnType().isAssignableFrom(returnValue.getClass()))
+			if(!lastMethodCalled.getReturnType().isPrimitive() &&
+			   !lastMethodCalled.getReturnType().isAssignableFrom(returnValue.getClass()))
 			{
 				throw new RuntimeException("Recorded return value has a wrong type. Expected type: "+
 						lastMethodCalled.getReturnType().getName()+", but receiced: "+returnValue.getClass().getName());
@@ -152,8 +153,9 @@ public class TestObject
 			{
 				((ThrowableContainer)returnValue).throwNow();
 			}
-			else if(method.getReturnType().isPrimitive())
+			else if(returnValue == null && method.getReturnType().isPrimitive())
 			{
+				//can not return null, so return default value for the type
 				return defaultPrimitiveReturnValues.get(method.getReturnType());
 			}
 			return returnValue;

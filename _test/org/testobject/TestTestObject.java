@@ -81,9 +81,67 @@ public class TestTestObject
 	}
 	
 	@Test
-	public void shouldBeAbleToSetExceptionOnVoidMethod()
+	public void shouldBeAbleToSetExceptionOnVoidMethodInterface()
 	{
 		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
+		assertThrowOnVoidMethod(testObject);
+	}
+	
+	@Test
+	public void shouldBeAbleToSetExceptionOnVoidMethodClass()
+	{
+		TestInterface testObject = TestObject.createTestObject(TestClass.class);
+		assertThrowOnVoidMethod(testObject);
+	}
+	
+	@Test
+	public void shouldBeAbleToAlterPrimitiveTypeDefaultValueInterface()
+	{
+		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
+		assertCanModifyReturnValueForPrimitiveType(testObject);	
+	}
+	
+	@Test
+	public void shouldBeAbleToAlterPrimitiveTypeDefaultValueClass()
+	{
+		TestInterface testObject = TestObject.createTestObject(TestClass.class);
+		assertCanModifyReturnValueForPrimitiveType(testObject);	
+	}
+
+	private void assertCanModifyReturnValueForPrimitiveType(
+			TestInterface testObject) {
+		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		
+		boolean expectedBoolean = true;
+		byte expectedByte = 9;
+		char expectedChar = 10;
+		short expectedShort = 11;
+		int expectedInt = 12;
+		long expectedLong = 13;
+		float expectedFloat = 14.2f;
+		double expectedDouble = 15.5d;
+		recorder.record(testObject.returnBoolean()).andReturn(expectedBoolean)
+				.record(testObject.returnByte()).andReturn(expectedByte)
+				.record(testObject.returnChar()).andReturn(expectedChar)
+				.record(testObject.returnShort()).andReturn(expectedShort)
+				.record(testObject.returnInt()).andReturn(expectedInt)
+				.record(testObject.returnLong()).andReturn(expectedLong)
+				.record(testObject.returnFloat()).andReturn(expectedFloat)
+				.record(testObject.returnDouble()).andReturn(expectedDouble);
+		
+		assertEquals(expectedBoolean, testObject.returnBoolean());
+		assertEquals(expectedByte, testObject.returnByte());
+		assertEquals(expectedChar, testObject.returnChar());
+		assertEquals(expectedShort, testObject.returnShort());
+		assertEquals(expectedInt, testObject.returnInt());
+		assertEquals(expectedLong, testObject.returnLong());
+		assertTrue(expectedFloat == testObject.returnFloat());
+		assertTrue(expectedDouble == testObject.returnDouble());
+	}
+	
+	//TODO test throw wrong exception
+
+	private void assertThrowOnVoidMethod(TestInterface testObject) {
 		TestObject.Recorder<TestInterface> recorder = 
 			new TestObject.Recorder<TestInterface>(testObject);
 		
