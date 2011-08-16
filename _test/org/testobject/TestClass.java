@@ -1,5 +1,7 @@
 package org.testobject;
 
+import java.io.IOException;
+
 public class TestClass implements TestInterface
 {
 
@@ -67,7 +69,7 @@ public class TestClass implements TestInterface
 	}
 
 	@Override
-	public void throwDeclardeException() throws Exception
+	public void throwDeclardeException() throws IOException
 	{}
 
 }

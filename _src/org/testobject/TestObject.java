@@ -13,18 +13,18 @@ import net.sf.cglib.proxy.MethodProxy;
 
 public class TestObject
 {	
-	private static Map<Class<?>, Object> defaultPrimitiveReturnValues = new HashMap<Class<?>, Object>();
+	private static Map<Class<?>, Object> DEFAULT_PRIMITIVE_RETURN_VALUES = new HashMap<Class<?>, Object>();
 
     static {
-        defaultPrimitiveReturnValues.put(Void.TYPE, null);
-        defaultPrimitiveReturnValues.put(Boolean.TYPE, Boolean.FALSE);
-        defaultPrimitiveReturnValues.put(Byte.TYPE, Byte.valueOf((byte) 0));
-        defaultPrimitiveReturnValues.put(Short.TYPE, Short.valueOf((short) 0));
-        defaultPrimitiveReturnValues.put(Character.TYPE, Character.valueOf((char) 0));
-        defaultPrimitiveReturnValues.put(Integer.TYPE, Integer.valueOf(0));
-        defaultPrimitiveReturnValues.put(Long.TYPE, Long.valueOf(0));
-        defaultPrimitiveReturnValues.put(Float.TYPE, Float.valueOf(0));
-        defaultPrimitiveReturnValues.put(Double.TYPE, Double.valueOf(0));
+        DEFAULT_PRIMITIVE_RETURN_VALUES.put(Void.TYPE, null);
+        DEFAULT_PRIMITIVE_RETURN_VALUES.put(Boolean.TYPE, Boolean.FALSE);
+        DEFAULT_PRIMITIVE_RETURN_VALUES.put(Byte.TYPE, Byte.valueOf((byte) 0));
+        DEFAULT_PRIMITIVE_RETURN_VALUES.put(Short.TYPE, Short.valueOf((short) 0));
+        DEFAULT_PRIMITIVE_RETURN_VALUES.put(Character.TYPE, Character.valueOf((char) 0));
+        DEFAULT_PRIMITIVE_RETURN_VALUES.put(Integer.TYPE, Integer.valueOf(0));
+        DEFAULT_PRIMITIVE_RETURN_VALUES.put(Long.TYPE, Long.valueOf(0));
+        DEFAULT_PRIMITIVE_RETURN_VALUES.put(Float.TYPE, Float.valueOf(0));
+        DEFAULT_PRIMITIVE_RETURN_VALUES.put(Double.TYPE, Double.valueOf(0));
     }
     
 	@SuppressWarnings("unchecked")
@@ -88,7 +88,7 @@ public class TestObject
 			mIsEnhanced = Enhancer.isEnhanced(aTestObject.getClass());
 		}
 		
-		public ReturnValueRecorder<T> record(final Object object)
+		public ReturnValueRecorder<T> record(final Object aObject)
 		{
 			return recordForLastCall();
 		}
@@ -116,47 +116,80 @@ public class TestObject
 	
 	private static class BaseHandler<T> implements InternalReturnValueRecorder<T>
 	{
-		protected Method lastMethodCalled;
+		protected Method mLastMethodCalled;
 		protected Map<Method, Object> mRecordings = new HashMap<Method, Object>();
 		
-		public void internal_andReturn(Object returnValue)
+		public void internal_andReturn(Object aReturnValue)
 		{
-			if(lastMethodCalled == null)
+			try
 			{
-				throw new RuntimeException("No method call");
+				if(mLastMethodCalled == null)
+				{
+					throw new RuntimeException("TestObject has no recorded method yet.");
+				}
+				if(!mLastMethodCalled.getReturnType().isPrimitive() &&
+						!mLastMethodCalled.getReturnType().isAssignableFrom(aReturnValue.getClass()))
+				{
+					throw new RuntimeException("Recorded return value has a wrong type. Expected type: "+
+							mLastMethodCalled.getReturnType().getName()+", but receiced: "+aReturnValue.getClass().getName());
+				}
+				mRecordings.put(mLastMethodCalled, aReturnValue);
 			}
-			if(!lastMethodCalled.getReturnType().isPrimitive() &&
-			   !lastMethodCalled.getReturnType().isAssignableFrom(returnValue.getClass()))
+			finally
 			{
-				throw new RuntimeException("Recorded return value has a wrong type. Expected type: "+
-						lastMethodCalled.getReturnType().getName()+", but receiced: "+returnValue.getClass().getName());
+				mLastMethodCalled = null;
 			}
-			mRecordings.put(lastMethodCalled, returnValue);
-			lastMethodCalled = null;
 		}
 		
-		public void internal_andThrow(Throwable throwable)
+		public void internal_andThrow(Throwable aThrowable)
 		{
-			if(lastMethodCalled == null)
+			try
 			{
-				throw new RuntimeException("No method call");
+				if(mLastMethodCalled == null)
+				{
+					throw new RuntimeException("TestObject has no recorded method yet.");
+				}
+				if(!Exception.class.isAssignableFrom(aThrowable.getClass())
+						|| RuntimeException.class.isAssignableFrom(aThrowable.getClass()))
+				{
+					//this is a unchecked exception
+					mRecordings.put(mLastMethodCalled, new ThrowableContainer(aThrowable));
+				}
+				else
+				{
+					//this is a checked exception, check if this can be thrown by the method
+					boolean canBeThrown = false;
+					for(Class<?> ex : mLastMethodCalled.getExceptionTypes())
+					{
+						if(ex.isAssignableFrom(aThrowable.getClass()))
+						{
+							mRecordings.put(mLastMethodCalled, new ThrowableContainer(aThrowable));
+							return;
+						}
+					}
+					throw new RuntimeException("Recorded Throwable as a wrong type for method "+mLastMethodCalled.getName()+
+							". Received type: " + aThrowable.getClass());
+				}
+				
 			}
-			mRecordings.put(lastMethodCalled, new ThrowableContainer(throwable));
-			lastMethodCalled = null;
+			finally
+			{
+				mLastMethodCalled = null;
+			}
 		}	
 		
-		protected Object executionCall(Method method) throws Throwable
+		protected Object executionCall(Method aMethod) throws Throwable
 		{
-			lastMethodCalled = method;
-			Object returnValue = mRecordings.get(method);
+			mLastMethodCalled = aMethod;
+			Object returnValue = mRecordings.get(aMethod);
 			if(returnValue instanceof ThrowableContainer)
 			{
 				((ThrowableContainer)returnValue).throwNow();
 			}
-			else if(returnValue == null && method.getReturnType().isPrimitive())
+			else if(returnValue == null && aMethod.getReturnType().isPrimitive())
 			{
 				//can not return null, so return default value for the type
-				return defaultPrimitiveReturnValues.get(method.getReturnType());
+				return DEFAULT_PRIMITIVE_RETURN_VALUES.get(aMethod.getReturnType());
 			}
 			return returnValue;
 		}
@@ -164,30 +197,30 @@ public class TestObject
 	
 	private static class RecordingProxyHandler<T> extends BaseHandler<T> implements InvocationHandler
 	{		
-		public Object invoke(Object target, Method method, Object[] arguments) throws Throwable
+		public Object invoke(Object aTarget, Method aMethod, Object[] aArguments) throws Throwable
 		{
-			return executionCall(method);
+			return executionCall(aMethod);
 		}		
 	}
 	
 	private static class RecordingClassProxyHandler<T> extends BaseHandler<T> implements MethodInterceptor
 	{
 		@Override
-		public Object intercept(Object arg0, Method arg1, Object[] arg2, MethodProxy arg3) throws Throwable
+		public Object intercept(Object aProxy, Method aMethod, Object[] aMethodArgs, MethodProxy aMethodProxy) throws Throwable
 		{			
-			if(arg1.getName().equals("internal_andReturn"))
+			if(aMethod.getName().equals("internal_andReturn"))
 			{
-				internal_andReturn(arg2[0]);
+				internal_andReturn(aMethodArgs[0]);
 				return null;
 			}
-			else if(arg1.getName().equals("internal_andThrow"))
+			else if(aMethod.getName().equals("internal_andThrow"))
 			{
-				internal_andThrow((Throwable)arg2[0]);
+				internal_andThrow((Throwable)aMethodArgs[0]);
 				return null;
 			}
 			else
 			{
-				return executionCall(arg1);
+				return executionCall(aMethod);
 			}
 		}	
 	}

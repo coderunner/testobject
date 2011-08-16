@@ -1,5 +1,7 @@
 package org.testobject;
 
+import java.io.IOException;
+
 import org.junit.Test;
 import static org.junit.Assert.* ;
 
@@ -107,6 +109,34 @@ public class TestTestObject
 		TestInterface testObject = TestObject.createTestObject(TestClass.class);
 		assertCanModifyReturnValueForPrimitiveType(testObject);	
 	}
+	
+	@Test
+	public void shouldNotAllowToThrowACheckedExceptionOfWrongTypeInterface() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
+		assertDoesNotAllowWrongTypeException(testObject);		
+	}
+	
+	@Test
+	public void shouldNotAllowToThrowACheckedExceptionOfWrongTypeClass() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestClass.class);
+		assertDoesNotAllowWrongTypeException(testObject);		
+	}
+
+	private void assertDoesNotAllowWrongTypeException(TestInterface testObject)
+			throws IOException {
+		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		
+		testObject.throwDeclardeException();
+		try
+		{
+			recorder.recordForLastCall().andThrow(new Exception());
+			fail();
+		}
+		catch (RuntimeException e)
+		{}
+	}
 
 	private void assertCanModifyReturnValueForPrimitiveType(
 			TestInterface testObject) {
@@ -138,8 +168,6 @@ public class TestTestObject
 		assertTrue(expectedFloat == testObject.returnFloat());
 		assertTrue(expectedDouble == testObject.returnDouble());
 	}
-	
-	//TODO test throw wrong exception
 
 	private void assertThrowOnVoidMethod(TestInterface testObject) {
 		TestObject.Recorder<TestInterface> recorder = 
@@ -166,9 +194,7 @@ public class TestTestObject
 			fail();
 		}
 		catch(RuntimeException e)
-		{
-			e.printStackTrace();
-		}
+		{}
 	}
 
 	private void assertRecodedExceptionThrown(TestInterface testObject)
