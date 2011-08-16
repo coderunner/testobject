@@ -5,7 +5,6 @@ import static org.junit.Assert.* ;
 
 public class TestTestObject
 {
-	//TODO: should work on void method as well...need to define throwable
 	//TODO: parameters matching for return or throw
 	//TODO: param matching using a comparator
 	//TODO: need match any type of matching
@@ -80,6 +79,25 @@ public class TestTestObject
 		TestInterface testObject = TestObject.createTestObject(TestClass.class);
 		assertExceptionThrownIfReturnValueHasWrongType(testObject);
 	}
+	
+	@Test
+	public void shouldBeAbleToSetExceptionOnVoidMethod()
+	{
+		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
+		TestObject.Recorder<TestInterface> recorder = 
+			new TestObject.Recorder<TestInterface>(testObject);
+		
+		testObject.returnNothing();
+		recorder.recordForLastCall().andThrow(new RuntimeException());
+		
+		try
+		{
+			testObject.returnNothing();
+			fail();
+		}
+		catch(RuntimeException e)
+		{}
+	}
 
 	private void assertExceptionThrownIfReturnValueHasWrongType(
 			TestInterface testObject) {
@@ -110,9 +128,6 @@ public class TestTestObject
 		catch(IllegalArgumentException ex)
 		{}
 	}
-	
-	
-
 	
 	private void assertReturnRecordedValue(TestInterface testObject)
 	{

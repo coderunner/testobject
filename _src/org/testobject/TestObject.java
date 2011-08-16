@@ -39,7 +39,7 @@ public class TestObject
 		{
 			Enhancer e = new Enhancer();
 			e.setSuperclass(aClass);
-			e.setInterfaces(new Class[]{ReturnValueRecorder.class});
+			e.setInterfaces(new Class[]{InternalReturnValueRecorder.class});
 			e.setCallback(new RecordingClassProxyHandler());
 			return (T) e.create();
 		}		
@@ -57,11 +57,11 @@ public class TestObject
 			{
 				if(mIsEnhanced)
 				{
-					((ReturnValueRecorder)mTestObject).andReturn(aReturnValue);
+					((InternalReturnValueRecorder)mTestObject).internal_andReturn(aReturnValue);
 				}
 				else
 				{
-					((ReturnValueRecorder)Proxy.getInvocationHandler(mTestObject)).andReturn(aReturnValue);	
+					((InternalReturnValueRecorder)Proxy.getInvocationHandler(mTestObject)).internal_andReturn(aReturnValue);	
 				}	
 				return Recorder.this;
 			}
@@ -72,15 +72,14 @@ public class TestObject
 			{
 				if(mIsEnhanced)
 				{
-					((ReturnValueRecorder)mTestObject).andThrow(aThowable);
+					((InternalReturnValueRecorder)mTestObject).internal_andThrow(aThowable);
 				}
 				else
 				{
-					((ReturnValueRecorder)Proxy.getInvocationHandler(mTestObject)).andThrow(aThowable);	
+					((InternalReturnValueRecorder)Proxy.getInvocationHandler(mTestObject)).internal_andThrow(aThowable);	
 				}	
 				return Recorder.this;
 			}
-			
 		};
 		
 		public Recorder(T aTestObject)
@@ -89,10 +88,16 @@ public class TestObject
 			mIsEnhanced = Enhancer.isEnhanced(aTestObject.getClass());
 		}
 		
-		public ReturnValueRecorder<T> record(Object callReturnValue)
+		public ReturnValueRecorder<T> record(final Object object)
 		{
-			return mReturnValueRecorder;
+			return recordForLastCall();
 		}
+		
+		public ReturnValueRecorder<T> recordForLastCall()
+		{
+			return mReturnValueRecorder; 
+		}
+
 	}
 	
 	public static interface ReturnValueRecorder<T>
@@ -102,12 +107,19 @@ public class TestObject
 		public Recorder<T> andThrow(Throwable aThowable);		
 	}
 	
-	private static class BaseHandler<T> implements ReturnValueRecorder<T>
+	private static interface InternalReturnValueRecorder<T>
+	{
+		public void internal_andReturn(Object aReturnValue);
+			
+		public void internal_andThrow(Throwable aThowable);		
+	}
+	
+	private static class BaseHandler<T> implements InternalReturnValueRecorder<T>
 	{
 		protected Method lastMethodCalled;
 		protected Map<Method, Object> mRecordings = new HashMap<Method, Object>();
 		
-		public Recorder<T> andReturn(Object returnValue)
+		public void internal_andReturn(Object returnValue)
 		{
 			if(lastMethodCalled == null)
 			{
@@ -120,10 +132,9 @@ public class TestObject
 			}
 			mRecordings.put(lastMethodCalled, returnValue);
 			lastMethodCalled = null;
-			return null;
 		}
 		
-		public Recorder<T> andThrow(Throwable throwable)
+		public void internal_andThrow(Throwable throwable)
 		{
 			if(lastMethodCalled == null)
 			{
@@ -131,7 +142,6 @@ public class TestObject
 			}
 			mRecordings.put(lastMethodCalled, new ThrowableContainer(throwable));
 			lastMethodCalled = null;
-			return null;
 		}	
 		
 		protected Object executionCall(Method method) throws Throwable
@@ -163,14 +173,14 @@ public class TestObject
 		@Override
 		public Object intercept(Object arg0, Method arg1, Object[] arg2, MethodProxy arg3) throws Throwable
 		{			
-			if(arg1.getName().equals("andReturn"))
+			if(arg1.getName().equals("internal_andReturn"))
 			{
-				andReturn(arg2[0]);
+				internal_andReturn(arg2[0]);
 				return null;
 			}
-			else if(arg1.getName().equals("andThrow"))
+			else if(arg1.getName().equals("internal_andThrow"))
 			{
-				andThrow((Throwable)arg2[0]);
+				internal_andThrow((Throwable)arg2[0]);
 				return null;
 			}
 			else
