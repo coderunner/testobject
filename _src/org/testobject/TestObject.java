@@ -483,7 +483,12 @@ public class TestObject
 			{
 				for(int i=0;i<mArgs.length;i++)
 				{
-					if(!mArgs[i].equals(aActualArgs[i]))
+					if((mArgs[i] == null && aActualArgs[i] != null)
+							|| (mArgs[i] != null && aActualArgs[i] == null))
+					{
+						return false;
+					}
+					if(mArgs[i] != null && !mArgs[i].equals(aActualArgs[i]))
 					{
 						return false;
 					}

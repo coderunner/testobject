@@ -191,6 +191,34 @@ public class TestTestObject
 		TestInterface testObject = TestObject.createTestObject(TestClass.class);
 		assertUseCustomMatcher(testObject);
 	}
+	
+	@Test
+	public void nullShouldBeMatchedInterface() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
+		assertNullParametersMatched(testObject);
+	}
+	
+	@Test
+	public void nullShouldBeMatchedClass() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestClass.class);
+		assertNullParametersMatched(testObject);
+	}
+
+	private void assertNullParametersMatched(TestInterface testObject) {
+		String stringArg = null;
+		int intArg = 11;
+		String returnedValue = "returnedValue"; 
+		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		recorder.record(testObject.methodWithArguments(stringArg, intArg)).andReturn(returnedValue);
+		
+		String actual = testObject.methodWithArguments("string", -1);
+		assertNull(actual); 
+		
+		actual = testObject.methodWithArguments(stringArg, intArg);
+		assertEquals(actual, returnedValue);
+	}
 
 	private void assertUseCustomMatcher(TestInterface testObject) {
 		String returnedValue = "returnedValue";
