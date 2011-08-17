@@ -17,4 +17,6 @@ public interface TestInterface
 	public void throwDeclardeException() throws IOException;
 	public Object returnObject();
 	public Integer returnInteger();
+	
+	public String methodWithArguments(String aString, int aInt);
 }

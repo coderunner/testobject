@@ -7,10 +7,8 @@ import static org.junit.Assert.* ;
 
 public class TestTestObject
 {
-	//TODO: parameters matching for return or throw
-	//TODO: param matching using a comparator
-	//TODO: need match any type of matching
-	//TODO: is more than one exact call that matched, then sequence?
+	//TODO: make sure null matching works!
+	//TODO: test void method with param matching
 	
 	@Test
 	public void shouldReturnDefaultPrimitiveValueIfNoRecordingForInterface()
@@ -123,6 +121,153 @@ public class TestTestObject
 		TestInterface testObject = TestObject.createTestObject(TestClass.class);
 		assertDoesNotAllowWrongTypeException(testObject);		
 	}
+	
+	@Test
+	public void useArgumentMatchingForRecordingBehaviorInterface() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
+		assertRecordingUseArgumentMatching(testObject);
+	}
+
+	@Test
+	public void useArgumentMatchingForRecordingBehaviorClass() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestClass.class);
+		assertRecordingUseArgumentMatching(testObject);
+	}
+	
+	@Test
+	public void useLooseArgumentMatchingInterface() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
+		assertUseLooseArgumentMatching(testObject);
+	}
+
+	@Test
+	public void useLooseArgumentMatchingClass() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestClass.class);
+		assertUseLooseArgumentMatching(testObject);
+	}
+	
+	@Test
+	public void useLooseArgumentMatchingWithEqMatcherInterface() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
+		assertEqMatcher(testObject);
+	}
+	
+	@Test
+	public void useLooseArgumentMatchingWithEqMatcherClass() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestClass.class);
+		assertEqMatcher(testObject);
+	}
+	
+	@Test
+	public void reportInvalidNumberOfMatchersInterface() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
+		assertReportWrongNumberOfMatchers(testObject);
+	}
+	
+	@Test
+	public void reportInvalidNumberOfMatchersClass() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestClass.class);
+		assertReportWrongNumberOfMatchers(testObject);
+	}
+	
+	@Test
+	public void useCustomMatcherInterface() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
+		assertUseCustomMatcher(testObject);
+	}
+	
+	@Test
+	public void useCustomMatcherClass() throws Exception
+	{
+		TestInterface testObject = TestObject.createTestObject(TestClass.class);
+		assertUseCustomMatcher(testObject);
+	}
+
+	private void assertUseCustomMatcher(TestInterface testObject) {
+		String returnedValue = "returnedValue";
+		String stringArg = "stringarg";
+		int intArg = -1;
+		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		recorder.record(testObject.methodWithArguments((String)recorder.matchObject(new ArgumentMatcher()
+		{
+			@Override
+			public boolean matches(Object aActual)
+			{
+				return ((String)aActual).startsWith("s");
+			}
+			
+		}), recorder.matchInt(new ArgumentMatcher()
+		{
+			@Override
+			public boolean matches(Object aActual)
+			{
+				return ((Integer)aActual).intValue() < 0;
+			}
+		}))).andReturn(returnedValue);
+		
+		String actual = testObject.methodWithArguments(stringArg, intArg);
+		assertEquals(actual, returnedValue);
+	}
+	
+	private void assertEqMatcher(TestInterface testObject)
+	{
+		String returnedValue = "returnedValue";
+		String stringArg = "stringarg";
+		int intArg = -1;
+		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		recorder.record(testObject.methodWithArguments(recorder.eqObject(stringArg), recorder.eqInt(intArg)))
+			.andReturn(returnedValue);
+		
+		String actual = testObject.methodWithArguments(stringArg, intArg);
+		assertEquals(actual, returnedValue);
+	}
+
+	private void assertReportWrongNumberOfMatchers(TestInterface testObject) {
+		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		try
+		{
+			recorder.record(testObject.methodWithArguments((String)recorder.anyObject(), 10))
+				.andReturn("value");
+			fail();
+		}
+		catch(RuntimeException e)
+		{}
+	}
+	
+	private void assertUseLooseArgumentMatching(TestInterface testObject) {
+		String returnedValue = "returnedValue"; 
+		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		recorder.record(testObject.methodWithArguments((String)recorder.anyObject(), recorder.anyInt()))
+			.andReturn(returnedValue);
+		
+		String actual = testObject.methodWithArguments("otherArg", -1);;
+		assertEquals(actual, returnedValue);
+	}
+	
+	private void assertRecordingUseArgumentMatching(TestInterface testObject) {
+		String stringArg = "arg";
+		int intArg = 11;
+		String returnedValue = "returnedValue"; 
+		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		recorder.record(testObject.methodWithArguments(stringArg, intArg)).andReturn(returnedValue);
+		
+		String actual = testObject.methodWithArguments("otherArg", -1);
+		assertNull(actual); 
+		
+		actual = testObject.methodWithArguments(stringArg, intArg);
+		assertEquals(actual, returnedValue);
+	}
+	
+	
 
 	private void assertDoesNotAllowWrongTypeException(TestInterface testObject)
 			throws IOException {

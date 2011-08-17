@@ -72,4 +72,10 @@ public class TestClass implements TestInterface
 	public void throwDeclardeException() throws IOException
 	{}
 
+	@Override
+	public String methodWithArguments(String aString, int aInt)
+	{
+		return "";
+	}
+
 }
