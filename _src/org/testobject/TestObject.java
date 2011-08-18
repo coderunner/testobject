@@ -14,16 +14,7 @@ import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
 public class TestObject
-{	
-	private static ArgumentMatcher ANY = new ArgumentMatcher()
-	{
-		@Override
-		public boolean matches(Object aActual)
-		{
-			return true;
-		}
-	};
-			
+{		
 	private static Map<Class<?>, Object> DEFAULT_PRIMITIVE_RETURN_VALUES = new HashMap<Class<?>, Object>();
 
     static {
@@ -114,114 +105,6 @@ public class TestObject
 			return mReturnValueRecorder; 
 		}
 				
-		public boolean anyBoolean()
-		{
-			addArgumentMatcher(ANY);
-			return false;
-		}
-		
-		public byte anyByte()
-		{
-			addArgumentMatcher(ANY);
-			return 0;
-		}
-		
-		public char anyChar()
-		{
-			addArgumentMatcher(ANY);
-			return 0;
-		}
-		
-		public short anyShort()
-		{
-			addArgumentMatcher(ANY);
-			return 0;
-		}
-		
-		public int anyInt()
-		{
-			addArgumentMatcher(ANY);
-			return 0;
-		}
-		
-		public long anyLong()
-		{
-			addArgumentMatcher(ANY);
-			return 0;
-		}
-		
-		public float anyFloat()
-		{
-			addArgumentMatcher(ANY);
-			return 0;
-		}
-		
-		public double anyDouble()
-		{
-			addArgumentMatcher(ANY);
-			return 0;
-		}
-		
-		public <A> A anyObject()
-		{
-			addArgumentMatcher(ANY);
-			return null;
-		}
-		
-		public boolean eqBoolean(boolean aExpected)
-		{
-			addArgumentMatcher(new EqMatcher(aExpected));
-			return false;
-		}
-		
-		public byte eqByte(byte aExpected)
-		{
-			addArgumentMatcher(new EqMatcher(aExpected));
-			return 0;
-		}
-		
-		public char eqChar(char aExpected)
-		{
-			addArgumentMatcher(new EqMatcher(aExpected));
-			return 0;
-		}
-		
-		public short eqShort(short aExpected)
-		{
-			addArgumentMatcher(new EqMatcher(aExpected));
-			return 0;
-		}
-		
-		public int eqInt(int aExpected)
-		{
-			addArgumentMatcher(new EqMatcher(aExpected));
-			return 0;
-		}
-		
-		public long eqLong(long aExpected)
-		{
-			addArgumentMatcher(new EqMatcher(aExpected));
-			return 0;
-		}
-		
-		public float eqFloat(float aExpected)
-		{
-			addArgumentMatcher(new EqMatcher(aExpected));
-			return 0;
-		}
-		
-		public double eqDouble(double aExpected)
-		{
-			addArgumentMatcher(new EqMatcher(aExpected));
-			return 0;
-		}
-		
-		public <A> A eqObject(A aExpected)
-		{
-			addArgumentMatcher(new EqMatcher(aExpected));
-			return null;
-		}
-		
 		public boolean matchBoolean(ArgumentMatcher aMatcher)
 		{
 			addArgumentMatcher(aMatcher);
@@ -319,9 +202,7 @@ public class TestObject
 				{
 					throw new RuntimeException("Recorded return value has a wrong type. Expected type: "+
 							mLastMethodCalled.getReturnType().getName()+", but receiced: "+aReturnValue.getClass().getName());
-				}
-				//TODO use matcher if any, check size of list == siez of arg[]
-				
+				}			
 				saveRecording(aReturnValue, aMatcherList);
 			}
 			finally
@@ -502,21 +383,5 @@ public class TestObject
 		{
 			 return mReturnedValue;
 		}
-	}
-	
-	private static class EqMatcher implements ArgumentMatcher
-	{
-		private final Object mExpected;
-		
-		public EqMatcher(Object aExpected)
-		{
-			mExpected = aExpected;
-		}
-		@Override
-		public boolean matches(Object aActual)
-		{
-			return mExpected.equals(aActual);
-		}
-		
 	}
 }

@@ -78,4 +78,7 @@ public class TestClass implements TestInterface
 		return "";
 	}
 
+	@Override
+	public void methodWithArguments(String aString)
+	{}
 }

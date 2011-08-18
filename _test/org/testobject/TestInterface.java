@@ -19,4 +19,5 @@ public interface TestInterface
 	public Integer returnInteger();
 	
 	public String methodWithArguments(String aString, int aInt);
+	public void methodWithArguments(String aString);
 }
