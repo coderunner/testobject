@@ -59,15 +59,12 @@ public class TestObject
 			{
 				if(mIsEnhanced)
 				{
-					((InternalReturnValueRecorder)mTestObject).internal_andReturn(aReturnValue,
-							mCurrentArgumentMatchers);
+					((InternalReturnValueRecorder)mTestObject).internal_andReturn(aReturnValue);
 				}
 				else
 				{
-					((InternalReturnValueRecorder)Proxy.getInvocationHandler(mTestObject)).internal_andReturn(aReturnValue,
-							mCurrentArgumentMatchers);	
+					((InternalReturnValueRecorder)Proxy.getInvocationHandler(mTestObject)).internal_andReturn(aReturnValue);	
 				}	
-				mCurrentArgumentMatchers = null;
 				return Recorder.this;
 			}
 
@@ -77,13 +74,12 @@ public class TestObject
 			{
 				if(mIsEnhanced)
 				{
-					((InternalReturnValueRecorder)mTestObject).internal_andThrow(aThowable, mCurrentArgumentMatchers);
+					((InternalReturnValueRecorder)mTestObject).internal_andThrow(aThowable);
 				}
 				else
 				{
-					((InternalReturnValueRecorder)Proxy.getInvocationHandler(mTestObject)).internal_andThrow(aThowable, mCurrentArgumentMatchers);	
+					((InternalReturnValueRecorder)Proxy.getInvocationHandler(mTestObject)).internal_andThrow(aThowable);	
 				}
-				mCurrentArgumentMatchers = null;
 				return Recorder.this;
 			}
 		};
@@ -100,8 +96,18 @@ public class TestObject
 			return recordForLastCall();
 		}
 		
+		@SuppressWarnings("unchecked")
 		public ReturnValueRecorder<T> recordForLastCall()
 		{
+			if(mIsEnhanced)
+			{
+				((InternalReturnValueRecorder)mTestObject).internal_setMatcherList(mCurrentArgumentMatchers);
+			}
+			else
+			{
+				((InternalReturnValueRecorder)Proxy.getInvocationHandler(mTestObject)).internal_setMatcherList(mCurrentArgumentMatchers);	
+			}
+			mCurrentArgumentMatchers = null;
 			return mReturnValueRecorder; 
 		}
 				
@@ -178,18 +184,22 @@ public class TestObject
 	
 	private static interface InternalReturnValueRecorder<T>
 	{
-		public void internal_andReturn(Object aReturnValue, List<ArgumentMatcher> aMatcherList);
+		public void internal_andReturn(Object aReturnValuet);
 			
-		public void internal_andThrow(Throwable aThowable, List<ArgumentMatcher> aMatcherList);		
+		public void internal_andThrow(Throwable aThowablet);
+		
+		public void internal_setMatcherList(List<ArgumentMatcher> aMatcherList);	
 	}
 	
 	private static class BaseHandler<T> implements InternalReturnValueRecorder<T>
 	{
 		protected Method mLastMethodCalled;
 		protected Object[] mLastArgs;
+		protected List<ArgumentMatcher> mLastMatcherList;
+		
 		protected Map<Method, Recording> mRecordings = new HashMap<Method, Recording>();
 		
-		public void internal_andReturn(Object aReturnValue, List<ArgumentMatcher> aMatcherList)
+		public void internal_andReturn(Object aReturnValue)
 		{
 			try
 			{
@@ -203,16 +213,15 @@ public class TestObject
 					throw new RuntimeException("Recorded return value has a wrong type. Expected type: "+
 							mLastMethodCalled.getReturnType().getName()+", but receiced: "+aReturnValue.getClass().getName());
 				}			
-				saveRecording(aReturnValue, aMatcherList);
+				saveRecording(aReturnValue, mLastMatcherList);
 			}
 			finally
 			{
-				mLastMethodCalled = null;
-				mLastArgs = null;
+				resetRecordState();
 			}
 		}
 		
-		public void internal_andThrow(Throwable aThrowable, List<ArgumentMatcher> aMatcherList)
+		public void internal_andThrow(Throwable aThrowable)
 		{
 			try
 			{
@@ -224,7 +233,7 @@ public class TestObject
 						|| RuntimeException.class.isAssignableFrom(aThrowable.getClass()))
 				{
 					//this is a unchecked exception
-					saveRecording(new ThrowableContainer(aThrowable), aMatcherList);
+					saveRecording(new ThrowableContainer(aThrowable), mLastMatcherList);
 				}
 				else
 				{
@@ -233,7 +242,7 @@ public class TestObject
 					{
 						if(ex.isAssignableFrom(aThrowable.getClass()))
 						{
-							saveRecording(new ThrowableContainer(aThrowable), aMatcherList);
+							saveRecording(new ThrowableContainer(aThrowable), mLastMatcherList);
 							return;
 						}
 					}
@@ -244,11 +253,16 @@ public class TestObject
 			}
 			finally
 			{
-				mLastMethodCalled = null;
-				mLastArgs = null;
-			}
-		}	
+				resetRecordState();
+			} 
+		}
 		
+		@Override
+		public void internal_setMatcherList(List<ArgumentMatcher> aMatcherList)
+		{
+			mLastMatcherList = aMatcherList;
+		}
+
 		protected Object executionCall(Method aMethod, Object[] aArgs) throws Throwable
 		{
 			mLastMethodCalled = aMethod;
@@ -270,6 +284,13 @@ public class TestObject
 			}
 			return null;
 		}
+		
+		private void resetRecordState()
+		{
+			mLastMethodCalled = null;
+			mLastArgs = null;
+			mLastMatcherList = null;
+		}	
 		
 		private void saveRecording(Object aReturnValue,	List<ArgumentMatcher> aMatcherList)
 		{
@@ -297,12 +318,17 @@ public class TestObject
 		{			
 			if(aMethod.getName().equals("internal_andReturn"))
 			{
-				internal_andReturn(aMethodArgs[0], (List<ArgumentMatcher>)aMethodArgs[1]);
+				internal_andReturn(aMethodArgs[0]);
 				return null;
 			}
 			else if(aMethod.getName().equals("internal_andThrow"))
 			{
-				internal_andThrow((Throwable)aMethodArgs[0], (List<ArgumentMatcher>)aMethodArgs[1]);
+				internal_andThrow((Throwable)aMethodArgs[0]);
+				return null;
+			}
+			else if(aMethod.getName().equals("internal_setMatcherList"))
+			{
+				internal_setMatcherList((List<ArgumentMatcher>)aMethodArgs[0]);
 				return null;
 			}
 			else
