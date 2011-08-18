@@ -1,4 +1,4 @@
-package org.testobject;
+package org.testobject.matcher;
 
 public interface ArgumentMatcher
 {

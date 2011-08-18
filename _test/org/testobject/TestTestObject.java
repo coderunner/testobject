@@ -3,6 +3,10 @@ package org.testobject;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.testobject.matcher.AnyMatcher;
+import org.testobject.matcher.ArgumentMatcher;
+import org.testobject.matcher.EqMatcher;
+
 import static org.junit.Assert.* ;
 
 public class TestTestObject

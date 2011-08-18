@@ -1,4 +1,5 @@
-package org.testobject;
+package org.testobject.matcher;
+
 
 public class EqMatcher implements ArgumentMatcher
 {
