@@ -1,9 +1,9 @@
 package org.testobject.matcher;
 
 
-public class AnyMatcher implements ArgumentMatcher
+public class Any implements Matcher
 {
-	public static AnyMatcher ANY = new AnyMatcher();
+	public static Any ANY = new Any();
 	
 	@Override
 	public boolean matches(Object aActual)

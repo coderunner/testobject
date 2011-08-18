@@ -1,11 +1,11 @@
 package org.testobject.matcher;
 
 
-public class EqMatcher implements ArgumentMatcher
+public class Eq implements Matcher
 {
 	private final Object mExpected;
 	
-	public EqMatcher(Object aExpected)
+	public Eq(Object aExpected)
 	{
 		mExpected = aExpected;
 	}

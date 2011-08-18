@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.testobject.matcher.ArgumentMatcher;
+import org.testobject.matcher.Matcher;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -85,7 +85,7 @@ public class TestObject
 				return Recorder.this;
 			}
 		};
-		private List<ArgumentMatcher> mCurrentArgumentMatchers;
+		private List<Matcher> mCurrentArgumentMatchers;
 		
 		public Recorder(T aTestObject)
 		{
@@ -113,65 +113,65 @@ public class TestObject
 			return mReturnValueRecorder; 
 		}
 				
-		public boolean matchBoolean(ArgumentMatcher aMatcher)
+		public boolean matchBoolean(Matcher aMatcher)
 		{
 			addArgumentMatcher(aMatcher);
 			return false;
 		}
 		
-		public byte matchByte(ArgumentMatcher aMatcher)
+		public byte matchByte(Matcher aMatcher)
 		{
 			addArgumentMatcher(aMatcher);
 			return 0;
 		}
 		
-		public char matchChar(ArgumentMatcher aMatcher)
+		public char matchChar(Matcher aMatcher)
 		{
 			addArgumentMatcher(aMatcher);
 			return 0;
 		}
 		
-		public short matchShort(ArgumentMatcher aMatcher)
+		public short matchShort(Matcher aMatcher)
 		{
 			addArgumentMatcher(aMatcher);
 			return 0;
 		}
 		
-		public int matchInt(ArgumentMatcher aMatcher)
+		public int matchInt(Matcher aMatcher)
 		{
 			addArgumentMatcher(aMatcher);
 			return 0;
 		}
 		
-		public long matchLong(ArgumentMatcher aMatcher)
+		public long matchLong(Matcher aMatcher)
 		{
 			addArgumentMatcher(aMatcher);
 			return 0;
 		}
 		
-		public float matchFloat(ArgumentMatcher aMatcher)
+		public float matchFloat(Matcher aMatcher)
 		{
 			addArgumentMatcher(aMatcher);
 			return 0;
 		}
 		
-		public double matchDouble(ArgumentMatcher aMatcher)
+		public double matchDouble(Matcher aMatcher)
 		{
 			addArgumentMatcher(aMatcher);
 			return 0;
 		}
 		
-		public <A> A matchObject(ArgumentMatcher aMatcher)
+		public <A> A matchObject(Matcher aMatcher)
 		{
 			addArgumentMatcher(aMatcher);
 			return null;
 		}
 		
-		private void addArgumentMatcher(ArgumentMatcher aMatcher)
+		private void addArgumentMatcher(Matcher aMatcher)
 		{
 			if(mCurrentArgumentMatchers == null)
 			{
-				mCurrentArgumentMatchers = new LinkedList<ArgumentMatcher>();
+				mCurrentArgumentMatchers = new LinkedList<Matcher>();
 			}
 			mCurrentArgumentMatchers.add(aMatcher);
 		}
@@ -190,14 +190,14 @@ public class TestObject
 			
 		public void internal_andThrow(Throwable aThowablet);
 		
-		public void internal_setMatcherList(List<ArgumentMatcher> aMatcherList);	
+		public void internal_setMatcherList(List<Matcher> aMatcherList);	
 	}
 	
 	private static class BaseHandler<T> implements InternalReturnValueRecorder<T>
 	{
 		protected Method mLastMethodCalled;
 		protected Object[] mLastArgs;
-		protected List<ArgumentMatcher> mLastMatcherList;
+		protected List<Matcher> mLastMatcherList;
 		
 		protected Map<Method, Recording> mRecordings = new HashMap<Method, Recording>();
 		
@@ -260,7 +260,7 @@ public class TestObject
 		}
 		
 		@Override
-		public void internal_setMatcherList(List<ArgumentMatcher> aMatcherList)
+		public void internal_setMatcherList(List<Matcher> aMatcherList)
 		{
 			mLastMatcherList = aMatcherList;
 		}
@@ -294,7 +294,7 @@ public class TestObject
 			mLastMatcherList = null;
 		}	
 		
-		private void saveRecording(Object aReturnValue,	List<ArgumentMatcher> aMatcherList)
+		private void saveRecording(Object aReturnValue,	List<Matcher> aMatcherList)
 		{
 			if(aMatcherList != null && mLastArgs.length != aMatcherList.size())
 			{
@@ -330,7 +330,7 @@ public class TestObject
 			}
 			else if(aMethod.getName().equals("internal_setMatcherList"))
 			{
-				internal_setMatcherList((List<ArgumentMatcher>)aMethodArgs[0]);
+				internal_setMatcherList((List<Matcher>)aMethodArgs[0]);
 				return null;
 			}
 			else
@@ -359,9 +359,9 @@ public class TestObject
 	{
 		private final Object[] mArgs;
 		private final Object mReturnedValue;
-		private final List<ArgumentMatcher> mMatcherList;
+		private final List<Matcher> mMatcherList;
 		
-		public Recording(Object[] aArgs, List<ArgumentMatcher> aMatcherList, Object aReturnValue)
+		public Recording(Object[] aArgs, List<Matcher> aMatcherList, Object aReturnValue)
 		{
 			mArgs = aArgs;
 			mMatcherList = aMatcherList;

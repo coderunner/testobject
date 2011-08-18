@@ -3,9 +3,9 @@ package org.testobject;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.testobject.matcher.AnyMatcher;
-import org.testobject.matcher.ArgumentMatcher;
-import org.testobject.matcher.EqMatcher;
+import org.testobject.matcher.Any;
+import org.testobject.matcher.Matcher;
+import org.testobject.matcher.Eq;
 
 import static org.junit.Assert.* ;
 
@@ -257,7 +257,7 @@ public class TestTestObject
 		String stringArg = "stringarg";
 		int intArg = -1;
 		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
-		recorder.record(testObject.methodWithArguments((String)recorder.matchObject(new ArgumentMatcher()
+		recorder.record(testObject.methodWithArguments((String)recorder.matchObject(new Matcher()
 		{
 			@Override
 			public boolean matches(Object aActual)
@@ -265,7 +265,7 @@ public class TestTestObject
 				return ((String)aActual).startsWith("s");
 			}
 			
-		}), recorder.matchInt(new ArgumentMatcher()
+		}), recorder.matchInt(new Matcher()
 		{
 			@Override
 			public boolean matches(Object aActual)
@@ -284,7 +284,7 @@ public class TestTestObject
 		String stringArg = "stringarg";
 		int intArg = -1;
 		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
-		recorder.record(testObject.methodWithArguments((String) recorder.matchObject(new EqMatcher(stringArg)), recorder.matchInt(new EqMatcher(intArg))))
+		recorder.record(testObject.methodWithArguments((String) recorder.matchObject(new Eq(stringArg)), recorder.matchInt(new Eq(intArg))))
 			.andReturn(returnedValue);
 		
 		String actual = testObject.methodWithArguments(stringArg, intArg);
@@ -295,7 +295,7 @@ public class TestTestObject
 		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
 		try
 		{
-			recorder.record(testObject.methodWithArguments((String)recorder.matchObject(AnyMatcher.ANY), 10))
+			recorder.record(testObject.methodWithArguments((String)recorder.matchObject(Any.ANY), 10))
 				.andReturn("value");
 			fail();
 		}
@@ -306,7 +306,7 @@ public class TestTestObject
 	private void assertUseLooseArgumentMatching(TestInterface testObject) {
 		String returnedValue = "returnedValue"; 
 		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
-		recorder.record(testObject.methodWithArguments((String)recorder.matchObject(AnyMatcher.ANY), recorder.matchInt(AnyMatcher.ANY)))
+		recorder.record(testObject.methodWithArguments((String)recorder.matchObject(Any.ANY), recorder.matchInt(Any.ANY)))
 			.andReturn(returnedValue);
 		
 		String actual = testObject.methodWithArguments("otherArg", -1);;

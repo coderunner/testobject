@@ -1,6 +1,6 @@
 package org.testobject.matcher;
 
-public interface ArgumentMatcher
+public interface Matcher
 {
 	public boolean matches(Object aActual);
 }
