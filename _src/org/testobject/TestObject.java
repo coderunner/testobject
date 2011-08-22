@@ -184,7 +184,7 @@ public class TestObject
 		public Recorder<T> andThrow(Throwable aThowable);		
 	}
 	
-	private static interface InternalReturnValueRecorder<T>
+	public static interface InternalReturnValueRecorder<T>
 	{
 		public void internal_andReturn(Object aReturnValuet);
 			
