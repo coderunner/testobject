@@ -1,6 +1,7 @@
-package org.testobject;
+package org.testobject.definition;
 
 import java.io.IOException;
+
 
 public class TestClass implements TestInterface
 {

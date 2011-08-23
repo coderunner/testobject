@@ -3,6 +3,8 @@ package org.testobject;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.testobject.definition.TestClass;
+import org.testobject.definition.TestInterface;
 import org.testobject.matcher.Any;
 import org.testobject.matcher.Matcher;
 import org.testobject.matcher.Eq;
@@ -222,7 +224,7 @@ public class TestTestObject
 	}
 
 	private void assertVoidMethodWithParamMatching(TestInterface testObject) {
-		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = new Recorder<TestInterface>(testObject);
 		
 		String arg = "arg";
 		testObject.methodWithArguments(arg);
@@ -242,7 +244,7 @@ public class TestTestObject
 		String stringArg = null;
 		int intArg = 11;
 		String returnedValue = "returnedValue"; 
-		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = new Recorder<TestInterface>(testObject);
 		recorder.record(testObject.methodWithArguments(stringArg, intArg)).andReturn(returnedValue);
 		
 		String actual = testObject.methodWithArguments("string", -1);
@@ -256,7 +258,7 @@ public class TestTestObject
 		String returnedValue = "returnedValue";
 		String stringArg = "stringarg";
 		int intArg = -1;
-		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = new Recorder<TestInterface>(testObject);
 		recorder.record(testObject.methodWithArguments((String)recorder.matchObject(new Matcher()
 		{
 			@Override
@@ -283,7 +285,7 @@ public class TestTestObject
 		String returnedValue = "returnedValue";
 		String stringArg = "stringarg";
 		int intArg = -1;
-		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
 		recorder.record(testObject.methodWithArguments((String) recorder.matchObject(new Eq(stringArg)), recorder.matchInt(new Eq(intArg))))
 			.andReturn(returnedValue);
 		
@@ -292,7 +294,7 @@ public class TestTestObject
 	}
 
 	private void assertReportWrongNumberOfMatchers(TestInterface testObject) {
-		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
 		try
 		{
 			recorder.record(testObject.methodWithArguments((String)recorder.matchObject(Any.ANY), 10))
@@ -305,7 +307,7 @@ public class TestTestObject
 	
 	private void assertUseLooseArgumentMatching(TestInterface testObject) {
 		String returnedValue = "returnedValue"; 
-		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
 		recorder.record(testObject.methodWithArguments((String)recorder.matchObject(Any.ANY), recorder.matchInt(Any.ANY)))
 			.andReturn(returnedValue);
 		
@@ -317,7 +319,7 @@ public class TestTestObject
 		String stringArg = "arg";
 		int intArg = 11;
 		String returnedValue = "returnedValue"; 
-		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
 		recorder.record(testObject.methodWithArguments(stringArg, intArg)).andReturn(returnedValue);
 		
 		String actual = testObject.methodWithArguments("otherArg", -1);
@@ -331,7 +333,7 @@ public class TestTestObject
 
 	private void assertDoesNotAllowWrongTypeException(TestInterface testObject)
 			throws IOException {
-		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
 		
 		testObject.throwDeclardeException();
 		try
@@ -345,7 +347,7 @@ public class TestTestObject
 
 	private void assertCanModifyReturnValueForPrimitiveType(
 			TestInterface testObject) {
-		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
 		
 		boolean expectedBoolean = true;
 		byte expectedByte = 9;
@@ -375,8 +377,8 @@ public class TestTestObject
 	}
 
 	private void assertThrowOnVoidMethod(TestInterface testObject) {
-		TestObject.Recorder<TestInterface> recorder = 
-			new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = 
+			TestObject.createRecorder(testObject);
 		
 		testObject.returnNothing();
 		recorder.recordForLastCall().andThrow(new RuntimeException());
@@ -392,7 +394,7 @@ public class TestTestObject
 
 	private void assertExceptionThrownIfReturnValueHasWrongType(
 			TestInterface testObject) {
-		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
 		try
 		{
 			recorder.record(testObject.toString()).andReturn(new Long(10));
@@ -404,8 +406,8 @@ public class TestTestObject
 
 	private void assertRecodedExceptionThrown(TestInterface testObject)
 	{
-		TestObject.Recorder<TestInterface> recorder = 
-			new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = 
+			TestObject.createRecorder(testObject);
 		
 		recorder.record(testObject.returnObject()).andThrow(new IllegalArgumentException());
 		
@@ -423,7 +425,7 @@ public class TestTestObject
 		String returnValue = "returnValue";
 		Integer returnInteger = 10;
 		
-		TestObject.Recorder<TestInterface> recorder = new TestObject.Recorder<TestInterface>(testObject);
+		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
 		recorder.record(testObject.returnObject()).andReturn(returnValue)
 				.record(testObject.returnInteger()).andReturn(returnInteger);
 		
