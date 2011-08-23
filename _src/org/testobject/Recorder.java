@@ -9,6 +9,13 @@ import net.sf.cglib.proxy.Enhancer;
 import org.testobject.TestObject.InternalReturnValueRecorder;
 import org.testobject.matcher.Matcher;
 
+/**
+ * This class is used to interact with the proxies to record the test object behavior.
+ *  
+ * @author felix trepanier
+ *
+ * @param <T> The type of the test object
+ */
 public class Recorder<T>
 {
 	private final T mTestObject;
@@ -53,11 +60,22 @@ public class Recorder<T>
 		mIsEnhanced = Enhancer.isEnhanced(aTestObject.getClass());
 	}
 	
+	/**
+	 * Record the behavior for the method call.
+	 * 
+	 * @param aObject Ignored return value
+	 * @return The return value recorder used to record the behavior for the specific call.
+	 */
 	public ReturnValueRecorder<T> record(final Object aObject)
 	{
 		return recordForLastCall();
 	}
 	
+	/**
+	 * Record the behavior for the last method call on the test object.
+	 * 
+	 * @return The return value recorder used to record the behavior for the specific call.
+	 */
 	@SuppressWarnings("unchecked")
 	public ReturnValueRecorder<T> recordForLastCall()
 	{
@@ -72,55 +90,109 @@ public class Recorder<T>
 		mCurrentArgumentMatchers = null;
 		return mReturnValueRecorder; 
 	}
-			
+	
+	/**
+	 * Specifies a matcher for a boolean type.
+	 * 
+	 * @param aMatcher The matcher
+	 * @return false
+	 */
 	public boolean matchBoolean(Matcher aMatcher)
 	{
 		addArgumentMatcher(aMatcher);
 		return false;
 	}
 	
+	/**
+	 * Specifies a matcher for a byte type.
+	 * 
+	 * @param aMatcher The matcher
+	 * @return 0
+	 */
 	public byte matchByte(Matcher aMatcher)
 	{
 		addArgumentMatcher(aMatcher);
 		return 0;
 	}
 	
+	/**
+	 * Specifies a matcher for a char type.
+	 * 
+	 * @param aMatcher The matcher
+	 * @return 0
+	 */
 	public char matchChar(Matcher aMatcher)
 	{
 		addArgumentMatcher(aMatcher);
 		return 0;
 	}
 	
+	/**
+	 * Specifies a matcher for a short type.
+	 * 
+	 * @param aMatcher The matcher
+	 * @return 0
+	 */
 	public short matchShort(Matcher aMatcher)
 	{
 		addArgumentMatcher(aMatcher);
 		return 0;
 	}
 	
+	/**
+	 * Specifies a matcher for a int type.
+	 * 
+	 * @param aMatcher The matcher
+	 * @return 0
+	 */
 	public int matchInt(Matcher aMatcher)
 	{
 		addArgumentMatcher(aMatcher);
 		return 0;
 	}
 	
+	/**
+	 * Specifies a matcher for a long type.
+	 * 
+	 * @param aMatcher The matcher
+	 * @return 0
+	 */
 	public long matchLong(Matcher aMatcher)
 	{
 		addArgumentMatcher(aMatcher);
 		return 0;
 	}
 	
+	/**
+	 * Specifies a matcher for a float type.
+	 * 
+	 * @param aMatcher The matcher
+	 * @return 0
+	 */
 	public float matchFloat(Matcher aMatcher)
 	{
 		addArgumentMatcher(aMatcher);
 		return 0;
 	}
 	
+	/**
+	 * Specifies a matcher for a double type.
+	 * 
+	 * @param aMatcher The matcher
+	 * @return 0
+	 */
 	public double matchDouble(Matcher aMatcher)
 	{
 		addArgumentMatcher(aMatcher);
 		return 0;
 	}
 	
+	/**
+	 * Specifies a matcher for a Object.
+	 * 
+	 * @param aMatcher The matcher
+	 * @return null
+	 */
 	public <A> A matchObject(Matcher aMatcher)
 	{
 		addArgumentMatcher(aMatcher);

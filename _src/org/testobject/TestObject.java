@@ -14,6 +14,13 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
+/**
+ * This is the entry point for TestObject. This class is used to create test object and recorder
+ * for TestObject.
+ * 
+ * @author felix trepanier
+ *
+ */
 public class TestObject
 {		
 	private static Map<Class<?>, Object> DEFAULT_PRIMITIVE_RETURN_VALUES = new HashMap<Class<?>, Object>();
@@ -30,6 +37,16 @@ public class TestObject
         DEFAULT_PRIMITIVE_RETURN_VALUES.put(Double.TYPE, Double.valueOf(0));
     }
     
+    private TestObject()
+    {}
+    
+    /**
+     * Create a test object with default behavior (return false, 0, null).
+     * 
+     * @param <T> The type of the test object
+     * @param aClass The class of the test object
+     * @return The test object
+     */
 	@SuppressWarnings("unchecked")
 	public static <T> T createTestObject(Class<T> aClass)
 	{
@@ -48,6 +65,14 @@ public class TestObject
 		}		
 	}
 	
+	/**
+	 * Create a recorder for the test object. The recorder allows to define returned values
+	 * or thrown exception for any methods for any parameters combination.
+	 * 
+	 * @param <T> The type of the test object
+	 * @param aTestObject The test object
+	 * @return The recoder for this test object
+	 */
 	public static <T> Recorder<T> createRecorder(T aTestObject)
 	{
 		return new Recorder<T>(aTestObject);
