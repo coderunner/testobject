@@ -55,42 +55,42 @@ public class TestTestObject
 		assertReturnRecordedValue(testObject);
 	}
 	
-	@Test
+	@Test(expected=IllegalArgumentException.class)
 	public void recordThrowExceptionShouldThrowExceptionInterface()
 	{
 		TestInterface testObject = TestObject.createTestObject(TestInterface.class);		
 		assertRecodedExceptionThrown(testObject);
 	}
 	
-	@Test
+	@Test(expected=IllegalArgumentException.class)
 	public void recordThrowExceptionShouldThrowExceptionClass()
 	{
 		TestInterface testObject = TestObject.createTestObject(TestClass.class);		
 		assertRecodedExceptionThrown(testObject);
 	}
 	
-	@Test
+	@Test(expected=RuntimeException.class)
 	public void shouldThrowExceptionIfSettingAReturnValueOfWrongTypeInterface()
 	{
 		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
 		assertExceptionThrownIfReturnValueHasWrongType(testObject);
 	}
 	
-	@Test
+	@Test(expected=RuntimeException.class)
 	public void shouldThrowExceptionIfSettingAReturnValueOfWrongTypeClass()
 	{
 		TestInterface testObject = TestObject.createTestObject(TestClass.class);
 		assertExceptionThrownIfReturnValueHasWrongType(testObject);
 	}
 	
-	@Test
+	@Test(expected=RuntimeException.class)
 	public void shouldBeAbleToSetExceptionOnVoidMethodInterface()
 	{
 		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
 		assertThrowOnVoidMethod(testObject);
 	}
 	
-	@Test
+	@Test(expected=RuntimeException.class)
 	public void shouldBeAbleToSetExceptionOnVoidMethodClass()
 	{
 		TestInterface testObject = TestObject.createTestObject(TestClass.class);
@@ -111,14 +111,14 @@ public class TestTestObject
 		assertCanModifyReturnValueForPrimitiveType(testObject);	
 	}
 	
-	@Test
+	@Test(expected=RuntimeException.class)
 	public void shouldNotAllowToThrowACheckedExceptionOfWrongTypeInterface() throws Exception
 	{
 		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
 		assertDoesNotAllowWrongTypeException(testObject);		
 	}
 	
-	@Test
+	@Test(expected=RuntimeException.class)
 	public void shouldNotAllowToThrowACheckedExceptionOfWrongTypeClass() throws Exception
 	{
 		TestInterface testObject = TestObject.createTestObject(TestClass.class);
@@ -167,14 +167,14 @@ public class TestTestObject
 		assertEqMatcher(testObject);
 	}
 	
-	@Test
+	@Test(expected=RuntimeException.class)
 	public void reportInvalidNumberOfMatchersInterface() throws Exception
 	{
 		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
 		assertReportWrongNumberOfMatchers(testObject);
 	}
 	
-	@Test
+	@Test(expected=RuntimeException.class)
 	public void reportInvalidNumberOfMatchersClass() throws Exception
 	{
 		TestInterface testObject = TestObject.createTestObject(TestClass.class);
@@ -209,21 +209,22 @@ public class TestTestObject
 		assertNullParametersMatched(testObject);
 	}
 
-	@Test
+	@Test(expected=RuntimeException.class)
 	public void voidMethodWithParamMatchingInterface() throws Exception
 	{
 		TestInterface testObject = TestObject.createTestObject(TestInterface.class);
 		assertVoidMethodWithParamMatching(testObject);
 	}
 	
-	@Test
+	@Test(expected=RuntimeException.class)
 	public void voidMethodWithParamMatchingClass() throws Exception
 	{
 		TestInterface testObject = TestObject.createTestObject(TestClass.class);
 		assertVoidMethodWithParamMatching(testObject);
 	}
 
-	private void assertVoidMethodWithParamMatching(TestInterface testObject) {
+	private void assertVoidMethodWithParamMatching(TestInterface testObject)
+	{
 		Recorder<TestInterface> recorder = new Recorder<TestInterface>(testObject);
 		
 		String arg = "arg";
@@ -231,16 +232,11 @@ public class TestTestObject
 		recorder.recordForLastCall().andThrow(new RuntimeException());
 		
 		testObject.methodWithArguments("otherstring");
-		try
-		{
-			testObject.methodWithArguments(arg);
-			fail();
-		}
-		catch(RuntimeException e)
-		{}
+		testObject.methodWithArguments(arg);
 	}
 
-	private void assertNullParametersMatched(TestInterface testObject) {
+	private void assertNullParametersMatched(TestInterface testObject)
+	{
 		String stringArg = null;
 		int intArg = 11;
 		String returnedValue = "returnedValue"; 
@@ -254,7 +250,8 @@ public class TestTestObject
 		assertEquals(actual, returnedValue);
 	}
 
-	private void assertUseCustomMatcher(TestInterface testObject) {
+	private void assertUseCustomMatcher(TestInterface testObject)
+	{
 		String returnedValue = "returnedValue";
 		String stringArg = "stringarg";
 		int intArg = -1;
@@ -293,19 +290,16 @@ public class TestTestObject
 		assertEquals(actual, returnedValue);
 	}
 
-	private void assertReportWrongNumberOfMatchers(TestInterface testObject) {
+	private void assertReportWrongNumberOfMatchers(TestInterface testObject)
+	{
 		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
-		try
-		{
-			recorder.record(testObject.methodWithArguments((String)recorder.matchObject(Any.ANY), 10))
-				.andReturn("value");
-			fail();
-		}
-		catch(RuntimeException e)
-		{}
+
+		recorder.record(testObject.methodWithArguments((String)recorder.matchObject(Any.ANY), 10))
+			.andReturn("value");
 	}
 	
-	private void assertUseLooseArgumentMatching(TestInterface testObject) {
+	private void assertUseLooseArgumentMatching(TestInterface testObject)
+	{
 		String returnedValue = "returnedValue"; 
 		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
 		recorder.record(testObject.methodWithArguments((String)recorder.matchObject(Any.ANY), recorder.matchInt(Any.ANY)))
@@ -315,7 +309,8 @@ public class TestTestObject
 		assertEquals(actual, returnedValue);
 	}
 	
-	private void assertRecordingUseArgumentMatching(TestInterface testObject) {
+	private void assertRecordingUseArgumentMatching(TestInterface testObject)
+	{
 		String stringArg = "arg";
 		int intArg = 11;
 		String returnedValue = "returnedValue"; 
@@ -332,21 +327,17 @@ public class TestTestObject
 	
 
 	private void assertDoesNotAllowWrongTypeException(TestInterface testObject)
-			throws IOException {
+			throws IOException
+	{
 		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
 		
 		testObject.throwDeclardeException();
-		try
-		{
-			recorder.recordForLastCall().andThrow(new Exception());
-			fail();
-		}
-		catch (RuntimeException e)
-		{}
+		recorder.recordForLastCall().andThrow(new Exception());
 	}
 
 	private void assertCanModifyReturnValueForPrimitiveType(
-			TestInterface testObject) {
+			TestInterface testObject)
+	{
 		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
 		
 		boolean expectedBoolean = true;
@@ -376,32 +367,22 @@ public class TestTestObject
 		assertTrue(expectedDouble == testObject.returnDouble());
 	}
 
-	private void assertThrowOnVoidMethod(TestInterface testObject) {
+	private void assertThrowOnVoidMethod(TestInterface testObject)
+	{
 		Recorder<TestInterface> recorder = 
 			TestObject.createRecorder(testObject);
 		
 		testObject.returnNothing();
 		recorder.recordForLastCall().andThrow(new RuntimeException());
-		
-		try
-		{
-			testObject.returnNothing();
-			fail();
-		}
-		catch(RuntimeException e)
-		{}
+
+		testObject.returnNothing();
 	}
 
 	private void assertExceptionThrownIfReturnValueHasWrongType(
-			TestInterface testObject) {
+			TestInterface testObject)
+	{
 		Recorder<TestInterface> recorder = TestObject.createRecorder(testObject);
-		try
-		{
-			recorder.record(testObject.toString()).andReturn(new Long(10));
-			fail();
-		}
-		catch(RuntimeException e)
-		{}
+		recorder.record(testObject.toString()).andReturn(new Long(10));
 	}
 
 	private void assertRecodedExceptionThrown(TestInterface testObject)
@@ -410,14 +391,7 @@ public class TestTestObject
 			TestObject.createRecorder(testObject);
 		
 		recorder.record(testObject.returnObject()).andThrow(new IllegalArgumentException());
-		
-		try
-		{
-			testObject.returnObject();
-			fail();
-		}
-		catch(IllegalArgumentException ex)
-		{}
+		testObject.returnObject();
 	}
 	
 	private void assertReturnRecordedValue(TestInterface testObject)
